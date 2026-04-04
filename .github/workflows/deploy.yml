@@ -10,42 +10,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to EC2 via SSH
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            set -e
-
-            APP_DIR="/home/ubuntu/CICDFlaskApp"
-
-            # Clone repo if not exists
-            if [ ! -d "$APP_DIR" ]; then
-              git clone https://github.com/Sandeeprajakgithub/CICDFlaskApp.git $APP_DIR
-            fi
-
-            cd $APP_DIR
-
-            # Pull latest code
-            git fetch origin
-            git reset --hard origin/master
-
-            # Kill old app if running
-            pkill -9 -f app.py || true
-
-            # Setup virtual environment
-            if [ ! -d "venv" ]; then
-              python3 -m venv venv
-            fi
-
+            cd /home/ubuntu/CICDFlaskApp
+            git clone https://github.com/Sandeeprajakgithub/CICDFlaskApp.git
+            pkill -f app.py || true
             source venv/bin/activate
-
-            # Install dependencies
-            pip install --upgrade pip
-
-            # Run app in background
-            nohup python3 app.py > app.log 2>&1 &
-
-            echo "✅ Deployment Successful"
+            python3 app.py
+            echo "Deployment completed"
