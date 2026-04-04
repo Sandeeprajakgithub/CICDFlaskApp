@@ -19,14 +19,18 @@ jobs:
           script: |
             cd /home/ubuntu/CICDFlaskApp
 
-            # Pull latest changes instead of cloning again
             git pull origin master
 
-            # Kill old instance
-            pkill -f app.py || true
+            # Kill only the previous app.py process by its PID, not by name broadly
+            if [ -f app.pid ]; then
+              kill $(cat app.pid) || true
+              rm app.pid
+            fi
 
-            # Activate venv and restart app in background
             source venv/bin/activate
+
+            # Start app and save its PID
             nohup python3 app.py > app.log 2>&1 &
+            echo $! > app.pid
 
             echo "Deployment completed"
