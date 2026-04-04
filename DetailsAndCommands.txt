@@ -1,0 +1,100 @@
+first of all 
+create a linux machine
+
+sudo apt update
+sudo apt install python3-pip -y
+Now lets install flask
+Sudo apt install python3.12-venv -y 
+Git clone https://github.com/Sandeeprajakgithub/CICDFlaskApp
+Python3 -m venv venv
+Source /venv/bin/activate
+pip install flask
+Run the app once
+python3 app.python3
+
+
+Now lets configure the creds in github actions
+
+run rsa commands 
+ssh-keygen -t rsa -b 4096 -C "github-actions" -f github_actions_key
+
+cat github_actions_key.pub >> authorized_keys
+cat authorized_keys
+
+Now - copy the private key and save into github settings --> Secrates and variables --> action --> add creds
+
+Now after saving the creds create folders
+
+maincodefolder
+|_ app.py 
+|_ .github\workflows   
+                    |_ deploy.yml
+
+
+
+deploy.yml copy this code 
+
+name: Deploy Flask App
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/CICDFlaskApp
+
+            git pull origin master
+
+            # Kill only the previous app.py process by its PID, not by name broadly
+            if [ -f app.pid ]; then
+              kill $(cat app.pid) || true
+              rm app.pid
+            fi
+            
+            source /home/ubuntu/venv/bin/activate
+
+            # Start app and save its PID
+            nohup python3 app.py > app.log 2>&1 &
+            echo $! > app.pid
+
+            echo "Deployment completed"
+
+Now push the code to github
+git init 
+git add .
+git commit -m "adding new code"
+git branche
+git remote -v (make sure the service repo is configured properly)
+if not then change the branch
+git remote set-url origin "github repo link"
+git push origin master/main
+
+
+Now few questions 
+
+what is uses: appleboy/ssh-action@v1.0.3
+GitHub Actions doesn't know how to SSH by default. 
+appleboy/ssh-action is a pre-built action (like a plugin) made by a developer 
+named appleboy that handles SSH connection for you.
+
+
+Explain this line nohup python3 app.py > app.log 2>&1 &
+nohup   python3 app.py   > app.log   2>&1   &
+  │           │               │        │     │
+  │           │               │        │     └── Run in background
+  │           │               │        └──  Merge errors into app.log
+  │           │               └── Send output to app.log
+  │           └── Run your flask app
+  └── Don't stop when SSH session closes
