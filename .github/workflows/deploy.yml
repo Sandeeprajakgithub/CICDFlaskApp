@@ -31,7 +31,6 @@ jobs:
 
             # Activate venv and install dependencies
             source venv/bin/activate
-            pip install -r requirements.txt
 
             # Kill old instance and restart in background
             pkill -f app.py || true
