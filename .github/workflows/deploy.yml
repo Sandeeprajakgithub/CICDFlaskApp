@@ -21,6 +21,6 @@ jobs:
             git fetch origin
             git reset --hard origin/master
             pkill -f app.py || true
-            sleep 2
-            setsid /home/ubuntu/CICDFlaskApp/venv/bin/python3 app.py > app.log 2>&1 &
+            source venv/bin/activate
+            python3 app.py
             echo "Deployment completed"
