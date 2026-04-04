@@ -26,8 +26,8 @@ jobs:
               kill $(cat app.pid) || true
               rm app.pid
             fi
-
-            source venv/bin/activate
+            
+            source /home/ubuntu/venv/bin/activate
 
             # Start app and save its PID
             nohup python3 app.py > app.log 2>&1 &
