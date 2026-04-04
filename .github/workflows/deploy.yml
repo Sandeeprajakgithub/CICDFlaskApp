@@ -22,4 +22,4 @@ jobs:
           git reset --hard origin/master
           pkill -f app.py || true
           sleep 2
-          nohup /home/ubuntu/CICDFlaskApp/venv/bin/python app.py > app.log 2>&1 &
+          nohup /home/ubuntu/CICDFlaskApp/venv/bin/python app.py > app.log 2>&1 < /dev/null &
