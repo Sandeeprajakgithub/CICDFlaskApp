@@ -21,4 +21,5 @@ jobs:
           git fetch origin
           git reset --hard origin/master
           pkill -f app.py || true
+          source venv/bin/activate
           nohup python3 app.py > app.log 2>&1 &
