@@ -23,3 +23,4 @@ jobs:
           pkill -f app.py || true
           sleep 2
           setsid /home/ubuntu/CICDFlaskApp/venv/bin/python app.py > app.log 2>&1 &
+          exit 0
