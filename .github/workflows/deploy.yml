@@ -68,6 +68,12 @@ jobs:
 
             cd /home/ubuntu/CICDFlaskApp
 
+            # Kill old app.py process if running
+            if [ -f app.pid ]; then
+              kill $(cat app.pid) || true
+              rm app.pid
+            fi
+
             # Pull latest code including Dockerfile
             git pull origin master
 
