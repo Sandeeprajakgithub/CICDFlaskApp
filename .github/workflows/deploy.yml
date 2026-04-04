@@ -17,9 +17,24 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ubuntu/CICDFlaskApp
-            git clone https://github.com/Sandeeprajakgithub/CICDFlaskApp.git
-            pkill -f app.py || true
+            cd /home/ubuntu
+
+            # Clone if not exists, otherwise pull latest changes
+            if [ ! -d "CICDFlaskApp" ]; then
+              git clone https://github.com/Sandeeprajakgithub/CICDFlaskApp.git
+            else
+              cd CICDFlaskApp && git pull origin master
+              cd /home/ubuntu
+            fi
+
+            cd CICDFlaskApp
+
+            # Activate venv and install dependencies
             source venv/bin/activate
-            python3 app.py
+            pip install -r requirements.txt
+
+            # Kill old instance and restart in background
+            pkill -f app.py || true
+            nohup python3 app.py > app.log 2>&1 &
+
             echo "Deployment completed"
